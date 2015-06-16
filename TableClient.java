@@ -15,6 +15,10 @@ import org.astrogrid.samp.client.DefaultClientProfile;
 import org.astrogrid.samp.client.HubConnection;
 import org.astrogrid.samp.client.HubConnector;
 import org.astrogrid.samp.httpd.UtilServer;
+import uk.ac.starlink.table.StarTable;
+import uk.ac.starlink.table.StoragePolicy;
+import uk.ac.starlink.util.DataSource;
+import uk.ac.starlink.votable.VOTableBuilder;
 
 /**
  * Basic SAMP client to receive a table.
@@ -23,9 +27,10 @@ public class TableClient {
 
     private static final String ICON_NAME = "/img/goggles2.png";
     private static final Logger logger_ = Logger.getLogger( "" );
+    private final VOTableBuilder votBuilder_;
 
     public TableClient( ClientProfile profile, int autoSec ) {
-
+        votBuilder_ = new VOTableBuilder( false );
         HubConnector connector = new HubConnector( profile );
 
         Metadata meta = new Metadata();
@@ -46,7 +51,7 @@ public class TableClient {
         connector.addMessageHandler(
                 new AbstractMessageHandler( "table.load.votable" ) {
             public Map processCall( HubConnection connection, String senderId,
-                                    Message msg ) throws MalformedURLException {
+                                    Message msg ) throws IOException {
                 assert "table.load.votable".equals( msg.getMType() );
                 String url = (String) msg.getRequiredParam( "url" );
                 String name = (String) msg.getParam( "name" );
@@ -61,8 +66,14 @@ public class TableClient {
         connector.setAutoconnect( autoSec );
     }
 
-    public void tableLoaded( URL tableUrl ) {
-        System.out.println( "Load table at: " + tableUrl );
+    public void tableLoaded( URL tableUrl ) throws IOException {
+        StarTable table =
+            votBuilder_.makeStarTable( DataSource.makeDataSource( tableUrl ),
+                                       false, StoragePolicy.ADAPTIVE );
+        System.out.println( "Load table at: "
+                          + tableUrl + " "
+                          + table.getRowCount() + " x "
+                          + table.getColumnCount() );
     }
 
     public static int runMain( String[] args ) {
