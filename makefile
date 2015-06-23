@@ -17,9 +17,8 @@ $(STIL):
 vovr.jar: $(SAMPLIB) $(STIL) $(SRCFILES) $(ICON)
 	rm -rf $(BUILDDIR)
 	mkdir $(BUILDDIR)
-	mkdir $(BUILDDIR)/img
 	javac -d $(BUILDDIR) -classpath $(SAMPLIB):$(STIL) $(SRCFILES) \
-        && cp $(ICON) $(BUILDDIR)/img/ \
+        && cp $(ICON) $(BUILDDIR)/ \
         && cd $(BUILDDIR) \
         && jar cf ../$@ . \
 

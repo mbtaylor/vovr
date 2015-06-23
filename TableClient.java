@@ -25,7 +25,7 @@ import uk.ac.starlink.votable.VOTableBuilder;
  */
 public class TableClient {
 
-    private static final String ICON_NAME = "/img/goggles2.png";
+    private static final String ICON_NAME = "goggles2.png";
     private static final Logger logger_ = Logger.getLogger( "" );
     private final VOTableBuilder votBuilder_;
 
@@ -37,7 +37,8 @@ public class TableClient {
         meta.setName( "VOVR" );
         try {
             meta.setIconUrl( UtilServer.getInstance()
-                            .exportResource( ICON_NAME )
+                            .getMapperHandler()
+                            .addLocalUrl( getClass().getResource( ICON_NAME ) )
                             .toString() );
         }
         catch ( IOException e ) {
